@@ -6,11 +6,11 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -22,7 +22,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 @EnableConfigurationProperties(DataSourceProperties.class)
 public class ServerletInitilizer extends SpringBootServletInitializer {
 
-    @Value("${spring.datasource.max-size}")
+	@Value("${spring.datasource.max-size}")
     private int maxSize;
 
     @Value("${spring.datasource.initial-size}")
@@ -81,6 +81,7 @@ public class ServerletInitilizer extends SpringBootServletInitializer {
 
     @Value("${spring.datasource.test-connection-on-checkout}")
     private boolean testConnectionOnCheckout;
+    
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
@@ -109,7 +110,7 @@ public class ServerletInitilizer extends SpringBootServletInitializer {
         characterEncodingFilter.setForceEncoding(true);
         return characterEncodingFilter;
     }
-
+    
     @Bean
     public ComboPooledDataSource dataSource() throws PropertyVetoException {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
