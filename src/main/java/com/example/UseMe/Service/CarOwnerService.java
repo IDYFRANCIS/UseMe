@@ -14,7 +14,7 @@ import com.example.UseMe.Model.CarOwner;
 public interface CarOwnerService {
 
 	
-	public CarOwner findByOwnerId(String OwnerId);
+	public CarOwner findByOwnerId(String ownerId);
 	
 	public CarOwner findByOwnerFirstName(String ownerFirstName);
 	
@@ -24,9 +24,11 @@ public interface CarOwnerService {
 	
 	public Collection<CarOwner> findAll();
 	
+	//public ServerResponse getAllRenterByOwner(String ownerId);
+	
 	public ServerResponse updateCarOwner(String ownerId, CarOwnerUpdate ownerUpdate);
 	
-	public ServerResponse createCarOwner(CarOwnerSignUp ownerSignUp);
+	public ServerResponse createCarOwner(String userCode, CarOwnerSignUp ownerSignUp);
 	
 	public ServerResponse deleteOwner(String ownerId);
 	

@@ -1,61 +1,22 @@
 package com.example.UseMe.Dto;
 
+import com.example.UseMe.Enum.CarUsage;
+
 public class CarUpdate {
 
 	
-	private String carOwnerEmail;
-	private String carOwnerPhoneNo;
-	private String carOwnerFirstName;
-	private String carOwnerLastName;
-	private String carOwnerAddress;
-	private String carOwnerGender;
+	
 	private String carColor;
 	private String carBrand;
 	private String carLocation;
 	private String carUsage;
 	private String carRegNo;
 	private String carMakeYear;
+	private CarUsage carUsageType;
 	
 	
 	
-	
-	public String getCarOwnerEmail() {
-		return carOwnerEmail;
-	}
-	public void setCarOwnerEmail(String carOwnerEmail) {
-		this.carOwnerEmail = carOwnerEmail;
-	}
-	public String getCarOwnerPhoneNo() {
-		return carOwnerPhoneNo;
-	}
-	public void setCarOwnerPhoneNo(String carOwnerPhoneNo) {
-		this.carOwnerPhoneNo = carOwnerPhoneNo;
-	}
-	public String getCarOwnerFirstName() {
-		return carOwnerFirstName;
-	}
-	public void setCarOwnerFirstName(String carOwnerFirstName) {
-		this.carOwnerFirstName = carOwnerFirstName;
-	}
-	public String getCarOwnerLastName() {
-		return carOwnerLastName;
-	}
-	public void setCarOwnerLastName(String carOwnerLastName) {
-		this.carOwnerLastName = carOwnerLastName;
-	}
-	public String getCarOwnerAddress() {
-		return carOwnerAddress;
-	}
-	public void setCarOwnerAddress(String carOwnerAddress) {
-		this.carOwnerAddress = carOwnerAddress;
-	}
-	public String getCarOwnerGender() {
-		return carOwnerGender;
-	}
-	public void setCarOwnerGender(String carOwnerGender) {
-		this.carOwnerGender = carOwnerGender;
-	}
-	public String getCarColor() {
+    public String getCarColor() {
 		return carColor;
 	}
 	public void setCarColor(String carColor) {
@@ -90,6 +51,12 @@ public class CarUpdate {
 	}
 	public void setCarMakeYear(String carMakeYear) {
 		this.carMakeYear = carMakeYear;
+	}
+	public CarUsage getCarUsageType() {
+		return carUsageType;
+	}
+	public void setCarUsageType(CarUsage carUsageType) {
+		this.carUsageType = carUsageType;
 	}
 	
 	

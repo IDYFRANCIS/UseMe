@@ -2,6 +2,7 @@ package com.example.UseMe.Dto;
 
 public class CarRenterSignUp {
 
+	
 	private String renterFirstName;
 	private String renterMiddleName;
 	private String renterLastName;
@@ -10,6 +11,7 @@ public class CarRenterSignUp {
 	private String renterPhoneNo;
 	private String renterEmail;
 	private String renterDateOfBirth;
+	
 	
 	
 	

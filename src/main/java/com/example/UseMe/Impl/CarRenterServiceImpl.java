@@ -9,14 +9,17 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import com.example.UseMe.Constants.ServerResponseStatus;
 import com.example.UseMe.Dto.CarRenterSignUp;
 import com.example.UseMe.Dto.CarRenterUpdate;
 import com.example.UseMe.Dto.ServerResponse;
 import com.example.UseMe.Model.Car;
-import com.example.UseMe.Model.CarOwner;
 import com.example.UseMe.Model.CarRenter;
+import com.example.UseMe.Model.User;
 import com.example.UseMe.Repository.CarRenterRepository;
+import com.example.UseMe.Repository.CarRepository;
+import com.example.UseMe.Repository.UserRepository;
 import com.example.UseMe.Service.CarRenterService;
 import com.example.UseMe.utility.Utility;
 
@@ -27,6 +30,12 @@ public class CarRenterServiceImpl implements CarRenterService{
 
 	@Autowired
 	private CarRenterRepository renterRepo;
+	
+	@Autowired
+	private CarRepository carRepo;
+	
+	@Autowired
+	private UserRepository userRepo;
 	
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -85,8 +94,7 @@ public class CarRenterServiceImpl implements CarRenterService{
  * 	                               CREATING CAR RENTER ACCOUNT
  **********************************************************************************************/
 	@Override
-	public ServerResponse createCarRenter(CarRenterSignUp renterSignUp) {
-		
+	public ServerResponse createCarRenter(String userCode, CarRenterSignUp renterSignUp) {
 		
 		  ServerResponse response = new ServerResponse();
 			
@@ -104,17 +112,21 @@ public class CarRenterServiceImpl implements CarRenterService{
 			
 			if (!Utility.isValidEmail(renterEmail)) {
 				
-				response.setData("Invalid Renter email address");
+				response.setData("");
+				response.setMessage("Invalid Renter email address");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 
-	            return response;
+	          return response;
 			}
 			
 			if (!Utility.isValidPhone(renterPhoneNo)) {
-				response.setData("Invalid Car Renter phone number");
+				response.setData("");
+				response.setMessage("Invalid Car Renter phone number");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 
-	            return response;
+	          return response;
 			}
 			
 			
@@ -122,10 +134,21 @@ public class CarRenterServiceImpl implements CarRenterService{
 			     CarRenter renterRequest = findByRenterPhoneNo(renterPhoneNo);
 				
 				if (renterRequest != null) {
-					response.setData("Car Renter already exist");
+					response.setData("");
+					response.setMessage("Car Renter already exist");
+					response.setSuccess(false);
 	                response.setStatus(ServerResponseStatus.FAILED);
 
-	                return response;
+	              return response;
+				}
+				
+				User uCode = userRepo.findByUserCode(userCode);
+				
+				if (uCode == null) {
+					response.setData("");
+					response.setMessage("User does not exist");
+					response.setSuccess(false);
+					response.setStatus(ServerResponseStatus.FAILED);
 				}
 				
 				renter = new CarRenter();
@@ -140,19 +163,23 @@ public class CarRenterServiceImpl implements CarRenterService{
 				renter.setRenterDateOfBirth(renterDateOfBirth);
 				
 				entityManager.persist(renter);
+				//renterRepo.save(renter);
 
-	            response.setData(renter);
-	            response.setStatus(ServerResponseStatus.CREATED);
-	            
+	          response.setData(renter);
+	          response.setMessage("Car renter created successfully");
+	          response.setSuccess(true);
+	          response.setStatus(ServerResponseStatus.CREATED);
+	          
 			} catch (Exception e) {
-			  response.setData("Failed to create car renter account");
+			  response.setData("");
+			  response.setMessage("An error occured");
+			  response.setSuccess(false);
 	          response.setStatus(ServerResponseStatus.FAILED);
-
-	          e.printStackTrace();
+	        e.printStackTrace();
+	        return response;
 			}
+			
 			return response;
-			
-			
 		
 	}
 
@@ -179,14 +206,18 @@ public class CarRenterServiceImpl implements CarRenterService{
 			
             if (!Utility.isValidEmail(renterEmail)) {
 				
-				response.setData("Invalid Car Renter email address");
+				response.setData("");
+				response.setMessage("Invalid Car Renter email address");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 
 	            return response;
 			}
 			
 			if (!Utility.isValidPhone(renterPhoneNo)) {
-				response.setData("Invalid Car Renter phone number");
+				response.setData("");
+				response.setMessage("Invalid Car Renter phone number");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 
 	            return response;
@@ -197,7 +228,9 @@ public class CarRenterServiceImpl implements CarRenterService{
 			     CarRenter updateRenter = findByRenterId(renterId);
 				
 				if (updateRenter == null) {
-					response.setData("Car Owner does not exist");
+					response.setData("");
+					response.setMessage("Car Owner does not exist");
+					response.setSuccess(false);
 	                response.setStatus(ServerResponseStatus.FAILED);
 
 	                return response;
@@ -223,16 +256,22 @@ public class CarRenterServiceImpl implements CarRenterService{
 					   renter.setRenterDateOfBirth(renterDateOfBirth);
 				  
 		           response.setData(renter);
+		           response.setMessage("Car renter detail updated successfully");
+		           response.setSuccess(true);
 		           response.setStatus(ServerResponseStatus.UPDATED);
 
 			        } catch (Exception e) {
-			            response.setData("Failed to update car renter account");
+			            response.setData("");
+			            response.setMessage("An error occured");
+			            response.setSuccess(false);
 			            response.setStatus(ServerResponseStatus.FAILED);
-
 			            e.printStackTrace();
+			            
+			            return response;
 			        }
 				
 			        return response;
+			        
 	}
 
 	
@@ -252,28 +291,109 @@ public class CarRenterServiceImpl implements CarRenterService{
     	 			
     	 			renter = findAll();
     	 			
-    	 			if (renter == null) {
-    	 				response.setData("No car renter available");
-    	 				response.setStatus(ServerResponseStatus.FAILED);
+    	 			if (renter.size() < 1) {
+    	 				response.setData("");
+    	 				response.setMessage("Car renter's list is empty");
+    	 				response.setSuccess(false);
+    	 				response.setStatus(ServerResponseStatus.NOT_FOUND);
     	 				
     	 				return response;
     	 			}
     	 			
     	 			response.setData(renter);
+    	 			response.setMessage("All car renters fetched successfully");
+    	 			response.setSuccess(true);
     	 			response.setStatus(ServerResponseStatus.OK);
     	 			
     	 		} catch (Exception e) {
-    	 			
+    	 			response.setData("");
+    	 			response.setMessage("An error occured");
+    	 			response.setSuccess(false);
     	 			response.setStatus(ServerResponseStatus.FAILED);
-    	         	response.setData("Failed fetching all car renter accounts");
     	             e.printStackTrace();
+    	             
+    	             return response;
     	 		}
-    	 		
     	 		
     	 		return response;	
     	 	
-    	        }
+    	   }
 
+       
+       
+ /**************************************************************************************************************
+  *                     RENT A CAR
+  **************************************************************************************************************/
+             
+       @Override
+       public ServerResponse rentCar(String renterId, String carId) {
+    	   
+    	   ServerResponse response = new ServerResponse();
+   		
+   		
+           if (renterId == null || renterId.isEmpty()) {
+    			
+    			response.setData("");
+    			response.setMessage("Please provide car renter details");
+    			response.setSuccess(false);
+    			response.setStatus(ServerResponseStatus.FAILED);
+    			
+    			return response;
+    		}
+    		
+    		if (carId == null || carId.isEmpty()) {
+    			
+    			response.setData("");
+    			response.setMessage("Please provide car details");
+    			response.setSuccess(false);
+    			response.setStatus(ServerResponseStatus.FAILED);
+    			
+    			return response;
+    		}
+    		
+    		try {
+    			CarRenter renter =  renterRepo.findByRenterId(renterId);
+    			 
+    			if (renter == null) {
+    				response.setData("");
+    				response.setMessage("Car renter not found");
+    				response.setSuccess(false);
+    				response.setStatus(ServerResponseStatus.FAILED);
+    				
+    				return response;
+    			}
+    			
+    			Car car = carRepo.findByCarId(carId);
+    			
+    			if (car == null) {
+    				response.setData("");
+    				response.setMessage("Car not found");
+    				response.setSuccess(false);
+    				response.setStatus(ServerResponseStatus.FAILED);
+    				
+    				return response;
+    			}
+    			
+    			renter.getCar().add(car);
+    			car.setCarRenter(renter);
+    			
+    			response.setData(renter);
+    			response.setMessage("Car assigned successfully to renter");
+    			response.setSuccess(true);
+    			response.setStatus(ServerResponseStatus.OK);
+    			
+    		}catch(Exception e) {
+    			response.setData("");
+    			response.setMessage("Failed to assign car");
+    			response.setSuccess(false);
+    			response.setStatus(ServerResponseStatus.INTERNAL_SERVER_ERROR);
+    			return response;
+    		}
+    		
+    		return response;
+    	   
+       }
+       
        
  /**************************************************************************************************************
   *                    VIEW RENTER BY PHONE NUMBER
@@ -292,22 +412,28 @@ public class CarRenterServiceImpl implements CarRenterService{
    			
    			if (renter == null) {
    				
-   				response.setData("Car Renter does not exist");
+   				response.setData("");
+   				response.setMessage("Car Renter does not exist");
+   				response.setSuccess(false);
    				response.setStatus(ServerResponseStatus.FAILED);
    				
    				return response;
    			}
    			
    			response.setData(renter);
+   			response.setMessage("Renter fetched by phone number");
+   			response.setSuccess(true);
    			response.setStatus(ServerResponseStatus.OK);
    			
    		} catch (Exception e) {
-   			
+   			response.setData("");
+   			response.setMessage("An error occured");
+   			response.setSuccess(false);
    			response.setStatus(ServerResponseStatus.FAILED);
-           	response.setData("Failed fetching car renter account");
-               e.printStackTrace();
+            e.printStackTrace();
+               
+            return response;
    		}
-   		
    		
    		return response;
    		
@@ -323,7 +449,9 @@ public class CarRenterServiceImpl implements CarRenterService{
     	 ServerResponse response = new ServerResponse();
  		
  		if (renterId == null) {
- 			response.setData("Car Renter 'ID' can not be null");
+ 			response.setData("");
+ 			response.setMessage("Car Renter 'ID' can not be null");
+ 			response.setSuccess(false);
  			response.setStatus(ServerResponseStatus.FAILED);
  				
  			return response;
@@ -334,7 +462,9 @@ public class CarRenterServiceImpl implements CarRenterService{
  			CarRenter renters = renterRepo.findByRenterId(renterId);
  			
  			if (renters == null) {
- 				response.setData("Car renter does not exist");
+ 				response.setData("");
+ 				response.setMessage("Car renter does not exist");
+ 				response.setSuccess(false);
  				response.setStatus(ServerResponseStatus.FAILED);
  				
  				return response;
@@ -348,20 +478,27 @@ public class CarRenterServiceImpl implements CarRenterService{
  			
  			 response.setStatus(ServerResponseStatus.DELETED);
  			 response.setData("Car Renter account has been successfully deleted");
+ 			 response.setMessage("Car Renter account has been successfully deleted");
+ 			 response.setSuccess(true);
 
  	        } catch (Exception e) {
  	        	response.setStatus(ServerResponseStatus.FAILED);
- 	        	response.setData("Failed to delete car renter account");
+ 	        	response.setData("");
+ 	        	response.setMessage("Failed to delete car renter account");
+ 	        	response.setSuccess(false);
  	            e.printStackTrace();
+ 	            
+ 	            return response;
  	        }
  		
  		return response;
  	    
            }
+
        
        
 
-    }
+ }
 
 
 

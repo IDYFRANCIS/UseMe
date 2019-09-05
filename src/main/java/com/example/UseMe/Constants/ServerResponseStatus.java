@@ -21,6 +21,9 @@ public class ServerResponseStatus {
 	    public final static int UNAUTHORIZED = HttpStatus.UNAUTHORIZED.value();
 
 	    public final static int NO_CONTENT = HttpStatus.NO_CONTENT.value();
+	    
+	    public final static int INTERNAL_SERVER_ERROR = HttpStatus.INTERNAL_SERVER_ERROR.value();
+	    
 
 	    private ServerResponseStatus() {
 	    	

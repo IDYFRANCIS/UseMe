@@ -20,6 +20,8 @@ public interface CarRenterRepository extends CrudRepository<CarRenter, String>{
 	
 	public Collection<CarRenter> findAll();
 	
+
+	
 	
 	
 }

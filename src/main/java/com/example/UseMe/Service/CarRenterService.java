@@ -22,9 +22,11 @@ public interface CarRenterService {
 	
 	public Collection<CarRenter> findAll();
 	
-	public ServerResponse createCarRenter(CarRenterSignUp renterSignUp);
+	public ServerResponse createCarRenter(String userCode, CarRenterSignUp renterSignUp);
 	
 	public ServerResponse updateCarRenter(String renterId,CarRenterUpdate renterUpdate);
+	
+	public ServerResponse rentCar(String renterId, String carId);
 	
 	public ServerResponse viewAll();
 	

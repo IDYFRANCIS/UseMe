@@ -13,10 +13,12 @@ import com.example.UseMe.Constants.ServerResponseStatus;
 import com.example.UseMe.Dto.CarSignUp;
 import com.example.UseMe.Dto.CarUpdate;
 import com.example.UseMe.Dto.ServerResponse;
+import com.example.UseMe.Enum.CarUsage;
 import com.example.UseMe.Model.Car;
+import com.example.UseMe.Model.CarOwner;
+import com.example.UseMe.Repository.CarOwnerRepository;
 import com.example.UseMe.Repository.CarRepository;
 import com.example.UseMe.Service.CarService;
-import com.example.UseMe.utility.Utility;
 
 
 @Service
@@ -25,6 +27,9 @@ public class CarServiceImpl implements CarService{
 	
 	@Autowired
 	private CarRepository carRepo;
+	
+	@Autowired
+	private CarOwnerRepository carOwnerRepo;
 	
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -47,7 +52,7 @@ public class CarServiceImpl implements CarService{
 	public Car findByBrand(String carBrand) {
 			
 			try {
-				return carRepo.findByCarBrand(carBrand);
+				return carRepo.findByCarBrandIgnoreCase(carBrand);
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -80,10 +85,10 @@ public class CarServiceImpl implements CarService{
 	}
 
 	@Override
-	public Car findByCarUsage(String carUsage) {
+	public Collection<Car> findByCarUsage(CarUsage carUsage) {
 		
 		try {
-			   return carRepo.findByCarUsage(carUsage);
+			   return carRepo.findByCarUsageType(carUsage);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -127,117 +132,78 @@ public class CarServiceImpl implements CarService{
 		return null;
 	}
 
-	@Override
-	public Car findByCarOwnerFirstName(String carOwnerFirstName) {
-		
-		try {
-			   return carRepo.findByCarOwnerFirstName(carOwnerFirstName);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
-	@Override
-	public Car findByCarOwnerPhoneNo(String carOwnerPhoneNo) {
-		
-		try {
-			   return carRepo.findByCarOwnerPhoneNo(carOwnerPhoneNo);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public Car findByCarOwnerAddress(String carOwnerAddress) {
-		
-		try {
-			    return carRepo.findByCarOwnerAddress(carOwnerAddress);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 /*******************************************************************************************************************************************
  *                                              CREATING A CAR ACCOUNT
  *******************************************************************************************************************************************/
 	@Override
-	public ServerResponse createCar(CarSignUp carSignUp) {
+	public ServerResponse createCar( String ownerId, CarSignUp carSignUp) {
 		
 		  ServerResponse response = new ServerResponse();
 			
 			Car cars = null;
 			
-			String carOwnerEmail = carSignUp.getCarOwnerEmail() != null ? carSignUp.getCarOwnerEmail() : carSignUp.getCarOwnerEmail();
-			String carOwnerPhoneNo = carSignUp.getCarOwnerPhoneNo() != null ? carSignUp.getCarOwnerPhoneNo() : carSignUp.getCarOwnerPhoneNo();
-			String carOwnerFirstName = carSignUp.getCarOwnerFirstName() != null ? carSignUp.getCarOwnerFirstName() : carSignUp.getCarOwnerFirstName();
-			String carOwnerLastName = carSignUp.getCarOwnerLastName() != null ? carSignUp.getCarOwnerLastName() : carSignUp.getCarOwnerLastName();
-			String carOwnerAddress = carSignUp.getCarOwnerAddress() != null ? carSignUp.getCarOwnerAddress() : carSignUp.getCarOwnerAddress();
-			String carOwnerGender = carSignUp.getCarOwnerGender() != null ? carSignUp.getCarOwnerGender() : carSignUp.getCarOwnerGender();
+		
 			String carColor = carSignUp.getCarColor() != null ? carSignUp.getCarColor() : carSignUp.getCarColor();
 			String carBrand = carSignUp.getCarBrand() != null ? carSignUp.getCarBrand() : carSignUp.getCarBrand();
 			String carLocation = carSignUp.getCarLocation() != null ? carSignUp.getCarLocation() : carSignUp.getCarLocation();
-			String carUsage = carSignUp.getCarUsage() != null ? carSignUp.getCarUsage() : carSignUp.getCarUsage();
+			CarUsage  carUsage = carSignUp.getCarUsageType() != null ? carSignUp.getCarUsageType() : carSignUp.getCarUsageType();
 			String carRegNo = carSignUp.getCarRegNo() != null ? carSignUp.getCarRegNo() : carSignUp.getCarRegNo();
 			String carMakeYear = carSignUp.getCarMakeYear() != null ? carSignUp.getCarMakeYear() : carSignUp.getCarMakeYear();
 			
-			
-			if (!Utility.isValidEmail(carOwnerEmail)) {
-				
-				response.setData("Invalid Car Owner email address");
-	            response.setStatus(ServerResponseStatus.FAILED);
-
-	            return response;
-			}
-			
-			if (!Utility.isValidPhone(carOwnerPhoneNo)) {
-				response.setData("Invalid Car Owner phone number");
-	            response.setStatus(ServerResponseStatus.FAILED);
-
-	            return response;
-			}
 			
 			
 			try {
 			     Car signUpRequest = findByCarRegNo(carRegNo);
 				
 				if (signUpRequest != null) {
-					response.setData("Car already exist");
+					response.setData("");
+					response.setMessage("Car already exist");
+					response.setSuccess(false);
 	                response.setStatus(ServerResponseStatus.FAILED);
 
 	                return response;
 				}
 				
+				CarOwner owner = carOwnerRepo.findByOwnerId(ownerId);
+				
+				if (owner == null) {
+					response.setData("");
+					response.setMessage("Car owner does not exist");
+					response.setSuccess(false);
+					response.setStatus(ServerResponseStatus.FAILED);
+				}
+				
 				cars = new Car();
 				
-				cars.setCarOwnerEmail(carOwnerEmail);
-				cars.setCarOwnerPhoneNo(carOwnerPhoneNo);
-				cars.setCarOwnerFirstName(carOwnerFirstName);
-				cars.setCarOwnerLastName(carOwnerLastName);
-				cars.setCarOwnerAddress(carOwnerAddress);
-				cars.setCarOwnerGender(carOwnerGender);
+			    cars.setCarOwner(owner);
 				cars.setCarColor(carColor);
 				cars.setCarBrand(carBrand);
 				cars.setCarLocation(carLocation);
-				cars.setCarUsage(carUsage);
+				cars.setCarUsageType(carUsage);
 				cars.setCarRegNo(carRegNo);
 				cars.setCarMakeYear(carMakeYear);
+
 				
 				entityManager.persist(cars);
 
 	            response.setData(cars);
 	            response.setStatus(ServerResponseStatus.CREATED);
-	            
+	            response.setSuccess(true);
+	            response.setMessage("Car created successfully");
+	             
 			} catch (Exception e) {
-			  response.setData("Failed to create car account");
+			  response.setData("");
+			  response.setMessage("Failed to create car");
+			  response.setSuccess(false);
 	          response.setStatus(ServerResponseStatus.FAILED);
-
 	          e.printStackTrace();
+	          return response;
+	             
 			}
+			
 			return response;
-			
-			
+				
 	}
 
 /**********************************************************************************************************************************
@@ -249,60 +215,28 @@ public class CarServiceImpl implements CarService{
 		  ServerResponse response = new ServerResponse();
 			
 			Car cars = null;
-			
-			String carOwnerEmail = carUpdate.getCarOwnerEmail() != null ? carUpdate.getCarOwnerEmail() : carUpdate.getCarOwnerEmail();
-			String carOwnerPhoneNo = carUpdate.getCarOwnerPhoneNo() != null ? carUpdate.getCarOwnerPhoneNo() : carUpdate.getCarOwnerPhoneNo();
-			String carOwnerFirstName = carUpdate.getCarOwnerFirstName() != null ? carUpdate.getCarOwnerFirstName() : carUpdate.getCarOwnerFirstName();
-			String carOwnerLastName = carUpdate.getCarOwnerLastName() != null ? carUpdate.getCarOwnerLastName() : carUpdate.getCarOwnerLastName();
-			String carOwnerAddress = carUpdate.getCarOwnerAddress() != null ? carUpdate.getCarOwnerAddress() : carUpdate.getCarOwnerAddress();
-			String carOwnerGender = carUpdate.getCarOwnerGender() != null ? carUpdate.getCarOwnerGender() : carUpdate.getCarOwnerGender();
-			String carColor = carUpdate.getCarColor() != null ? carUpdate.getCarColor() : carUpdate.getCarColor();
+		    String carColor = carUpdate.getCarColor() != null ? carUpdate.getCarColor() : carUpdate.getCarColor();
 			String carBrand = carUpdate.getCarBrand() != null ? carUpdate.getCarBrand() : carUpdate.getCarBrand();
 			String carLocation = carUpdate.getCarLocation() != null ? carUpdate.getCarLocation() : carUpdate.getCarLocation();
-			String carUsage = carUpdate.getCarUsage() != null ? carUpdate.getCarUsage() : carUpdate.getCarUsage();
+			CarUsage carUsage = carUpdate.getCarUsageType() != null ?  carUpdate.getCarUsageType() : carUpdate.getCarUsageType();
 			String carRegNo = carUpdate.getCarRegNo() != null ? carUpdate.getCarRegNo() : carUpdate.getCarRegNo();
 			String carMakeYear = carUpdate.getCarMakeYear() != null ? carUpdate.getCarMakeYear() : carUpdate.getCarMakeYear();
-			
-            if (!Utility.isValidEmail(carOwnerEmail)) {
-				
-				response.setData("Invalid Car Owner email address");
-	            response.setStatus(ServerResponseStatus.FAILED);
-
-	            return response;
-			}
-			
-			if (!Utility.isValidPhone(carOwnerPhoneNo)) {
-				response.setData("Invalid Car Owner phone number");
-	            response.setStatus(ServerResponseStatus.FAILED);
-
-	            return response;
-			}
 			
 
 			try {
 			     Car updateRequest = findByCarId(carId);
 				
 				if (updateRequest == null) {
-					response.setData("Car does not exist");
-	                response.setStatus(ServerResponseStatus.NOT_FOUND);
+					response.setData("");
+					response.setMessage("Car does not exist");
+	                response.setStatus(ServerResponseStatus.FAILED);
 
 	                return response;
 				}
 				
 				  cars = entityManager.find(Car.class, updateRequest.getCarId());
 				   
-				   if (carOwnerEmail != null) 
-					   cars.setCarOwnerEmail(carOwnerEmail);
-				   if (carOwnerPhoneNo != null) 
-					   cars.setCarOwnerPhoneNo(carOwnerPhoneNo);
-				   if (carOwnerFirstName != null) 
-					   cars.setCarOwnerFirstName(carOwnerFirstName);
-				   if (carOwnerLastName != null) 
-					   cars.setCarOwnerLastName(carOwnerLastName);
-				   if (carOwnerAddress != null) 
-					   cars.setCarOwnerAddress(carOwnerAddress);
-				   if (carOwnerGender != null) 
-					   cars.setCarOwnerGender(carOwnerGender);
+				 
 				   if (carColor != null) 
 					   cars.setCarColor(carColor);
 				   if (carBrand != null) 
@@ -310,20 +244,25 @@ public class CarServiceImpl implements CarService{
 				   if (carLocation != null) 
 					   cars.setCarLocation(carLocation);
 				   if (carUsage != null) 
-					   cars.setCarUsage(carUsage);
+				       cars.setCarUsageType(carUsage);
 				   if (carRegNo != null) 
 					   cars.setCarRegNo(carRegNo);
 				   if (carMakeYear != null) 
 					   cars.setCarMakeYear(carMakeYear);
 					
 		           response.setData(cars);
+		           response.setMessage("Car details updated successfully");
+		           response.setSuccess(true);
 		           response.setStatus(ServerResponseStatus.UPDATED);
 
 			        } catch (Exception e) {
-			            response.setData("Failed to update car account");
+			            response.setData("");
+			            response.setMessage("Failed to update car details");
+			            response.setSuccess(false);
 			            response.setStatus(ServerResponseStatus.FAILED);
-
 			            e.printStackTrace();
+			            
+			            return response;
 			        }
 				
 			        return response;
@@ -344,26 +283,32 @@ public class CarServiceImpl implements CarService{
 			
 			cars = findAll();
 			
-			if (cars == null) {
-				response.setData("No car available");
-				response.setStatus(ServerResponseStatus.NO_CONTENT);
+			if (cars.size() < 1) {
+				response.setData("");
+				response.setMessage("Car list is empty");
+				response.setSuccess(false);
+				response.setStatus(ServerResponseStatus.NOT_FOUND);
 				
 				return response;
 			}
 			
 			response.setData(cars);
+			response.setMessage("Cars fetched successfully");
+			response.setSuccess(true);
 			response.setStatus(ServerResponseStatus.OK);
 			
 		} catch (Exception e) {
 			
 			response.setStatus(ServerResponseStatus.FAILED);
-        	response.setData("Failed fetching user accounts");
+        	response.setData("");
+        	response.setMessage("Something went wrong");
+        	response.setSuccess(false);
             e.printStackTrace();
+            
+            return response;
 		}
-		
-		
+
 		return response;	
-	
 	
       }
 
@@ -380,7 +325,8 @@ public class CarServiceImpl implements CarService{
 		
 		try {
 			if(carBrand == null) {
-				response.setData("Car brand cannot be empty");
+				response.setData("");
+				response.setMessage("Car brand cannot be empty");
 				response.setStatus(ServerResponseStatus.FAILED);
 				
 				return response;
@@ -388,7 +334,8 @@ public class CarServiceImpl implements CarService{
 			}
 			
 			if(carMakeYear == null) {
-				response.setData("Car make year connot be empty");
+				response.setData("");
+				response.setMessage("Car make year connot be empty");
 				response.setStatus(ServerResponseStatus.FAILED);
 				
 				return response;
@@ -397,20 +344,27 @@ public class CarServiceImpl implements CarService{
 			 cars = carRepo.findAllByCarBrandAndMakeYear(carBrand, carMakeYear);
 			
 			if(cars.size() < 1) {
-				response.setData("Car with such brand and make year does not exist");
-				response.setStatus(ServerResponseStatus.OK);
+				response.setData("");
+				response.setMessage("Car with such brand and make year does not exist");
+				response.setStatus(ServerResponseStatus.NOT_FOUND);
+				response.setSuccess(false);
 				
 				return response;
 			}
 			
 			response.setData(cars);
+			response.setMessage("Car fetched successfully");
+			response.setSuccess(true);
 			response.setStatus(ServerResponseStatus.OK);
 			
 		} catch (Exception e) {
 			
 			response.setStatus(ServerResponseStatus.FAILED);
-        	response.setData("Failed fetching car details");
+        	response.setData("");
+        	response.setMessage("Failed fetching car details");
+        	response.setSuccess(false);
             e.printStackTrace();
+            return response;
 		}
 		
 		return response;
@@ -434,22 +388,28 @@ public class CarServiceImpl implements CarService{
 			
 			if (cars == null) {
 				
-				response.setData("Car brand not found");
+				response.setData("");
+				response.setMessage("Car brand not found");
 				response.setStatus(ServerResponseStatus.FAILED);
 				
 				return response;
 			}
 			
 			response.setData(cars);
+			response.setMessage("Car fetched successfully");
+			response.setSuccess(true);
 			response.setStatus(ServerResponseStatus.OK);
 			
 		} catch (Exception e) {
 			
 			response.setStatus(ServerResponseStatus.FAILED);
-        	response.setData("Failed fetching user account");
+        	response.setData("");
+        	response.setMessage("Failed fetching car details");
+        	response.setSuccess(false);
             e.printStackTrace();
+            
+            return response;
 		}
-		
 		
 		return response;
 	}
@@ -463,7 +423,8 @@ public class CarServiceImpl implements CarService{
          ServerResponse response = new ServerResponse();
 		
 		if (carId == null) {
-			response.setData("Car 'ID' can not be null");
+			response.setData("");
+			response.setMessage("Car 'ID' can not be null");
 			response.setStatus(ServerResponseStatus.FAILED);
 				
 			return response;
@@ -474,7 +435,8 @@ public class CarServiceImpl implements CarService{
 			Car cars = carRepo.findByCarId(carId);
 			
 			if (cars == null) {
-				response.setData("Car does not exist");
+				response.setData("");
+				response.setMessage("Car does not exist");
 				response.setStatus(ServerResponseStatus.FAILED);
 				
 				return response;
@@ -487,11 +449,17 @@ public class CarServiceImpl implements CarService{
 			
 			 response.setStatus(ServerResponseStatus.DELETED);
 			 response.setData("Car account has been successfully deleted");
+			 response.setMessage("Car account has been successfully deleted");
+			 response.setSuccess(true);
 
 	        } catch (Exception e) {
 	        	response.setStatus(ServerResponseStatus.FAILED);
-	        	response.setData("Failed to delete car account");
+	        	response.setData("");
+	        	response.setMessage("Failed to delete car account");
+	        	response.setSuccess(false);
 	            e.printStackTrace();
+	            
+	            return response;
 	        }
 		
 		return response;
@@ -515,22 +483,28 @@ public class CarServiceImpl implements CarService{
 		
 		if (cars == null) {
 			
-			response.setData("Car reg no not found");
+			response.setData("");
+			response.setMessage("Car reg no not found");
 			response.setStatus(ServerResponseStatus.FAILED);
 			
 			return response;
 		}
 		
 		response.setData(cars);
+		response.setMessage("Car fetched successfully");
+		response.setSuccess(true);
 		response.setStatus(ServerResponseStatus.OK);
 		
 	} catch (Exception e) {
 		
 		response.setStatus(ServerResponseStatus.FAILED);
-    	response.setData("Failed fetching car by reg no");
+    	response.setData("");
+    	response.setMessage("Failed fetching car by reg no");
+    	response.setSuccess(false);
         e.printStackTrace();
+        
+        return response;
 	}
-	
 	
 	return response;
 }

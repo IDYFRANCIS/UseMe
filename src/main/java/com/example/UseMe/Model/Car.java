@@ -5,16 +5,22 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.example.UseMe.Enum.CarUsage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "Car")
+@Table(name = "car")
 public class Car implements Serializable{
 	
 	@Id
@@ -23,99 +29,43 @@ public class Car implements Serializable{
 	@Column(name = "car_id", nullable = false, unique = true)
 	private String carId;
 	
-	@Column
-	private String carOwnerEmail;
 	
-	@Column
-	private String carOwnerPhoneNo;
-	
-	@Column
-	private String carOwnerFirstName;
-	
-	@Column
-	private String carOwnerLastName;
-	
-	@Column
-	private String carOwnerAddress;
-	
-	@Column
-	private String carOwnerGender;
-	
-	@Column
+	@Column(name = "car_color")
 	private String carColor;
 	
-	@Column
+	@Column(name = "car_brand")
 	private String carBrand;
 	
-	@Column
+	@Column(name = "car_location")
 	private String carLocation;
 	
-	@Column
-	private String carUsage;
-	
-	@Column
+	@Column(name = "car_reg_no")
 	private String carRegNo;
 	
-	@Column
+	@Column(name = "car_make_year")
 	private String carMakeYear;
+	
+	@Column(name = "car_usage")
+	private CarUsage carUsageType;
+	
+  //  @JsonIgnore
+	@ManyToOne
+    @JoinColumn(name = "owner_id")
+    private CarOwner carOwner;
+    
+	@JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "renter_id")
+    private CarRenter carRenter;
 
-	
-	
-	
+    
+    
 	public String getCarId() {
 		return carId;
 	}
 
 	public void setCarId(String carId) {
 		this.carId = carId;
-	}
-
-	public String getCarOwnerEmail() {
-		return carOwnerEmail;
-	}
-
-	public void setCarOwnerEmail(String carOwnerEmail) {
-		this.carOwnerEmail = carOwnerEmail;
-	}
-
-	public String getCarOwnerPhoneNo() {
-		return carOwnerPhoneNo;
-	}
-
-	public void setCarOwnerPhoneNo(String carOwnerPhoneNo) {
-		this.carOwnerPhoneNo = carOwnerPhoneNo;
-	}
-
-	public String getCarOwnerFirstName() {
-		return carOwnerFirstName;
-	}
-
-	public void setCarOwnerFirstName(String carFirstOwnerName) {
-		this.carOwnerFirstName = carFirstOwnerName;
-	}
-
-	public String getCarOwnerLastName() {
-		return carOwnerLastName;
-	}
-
-	public void setCarOwnerLastName(String carLastLastName) {
-		this.carOwnerLastName = carLastLastName;
-	}
-
-	public String getCarOwnerAddress() {
-		return carOwnerAddress;
-	}
-
-	public void setCarOwnerAddress(String carOwnerAddress) {
-		this.carOwnerAddress = carOwnerAddress;
-	}
-
-	public String getCarOwnerGender() {
-		return carOwnerGender;
-	}
-
-	public void setCarOwnerGender(String carOwnerGender) {
-		this.carOwnerGender = carOwnerGender;
 	}
 
 	public String getCarColor() {
@@ -142,14 +92,6 @@ public class Car implements Serializable{
 		this.carLocation = carLocation;
 	}
 
-	public String getCarUsage() {
-		return carUsage;
-	}
-
-	public void setCarUsage(String carUsage) {
-		this.carUsage = carUsage;
-	}
-
 	public String getCarRegNo() {
 		return carRegNo;
 	}
@@ -165,9 +107,29 @@ public class Car implements Serializable{
 	public void setCarMakeYear(String carMakeYear) {
 		this.carMakeYear = carMakeYear;
 	}
-	
-	
-	
-	
 
+	public CarUsage getCarUsageType() {
+		return carUsageType;
+	}
+
+	public void setCarUsageType(CarUsage carUsageType) {
+		this.carUsageType = carUsageType;
+	}
+
+	public CarOwner getCarOwner() {
+		return carOwner;
+	}
+
+	public void setCarOwner(CarOwner carOwner) {
+		this.carOwner = carOwner;
+	}
+
+	public CarRenter getCarRenter() {
+		return carRenter;
+	}
+
+	public void setCarRenter(CarRenter carRenter) {
+		this.carRenter = carRenter;
+	}
+    
 }

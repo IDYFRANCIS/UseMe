@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.UseMe.Dto.CarSignUp;
 import com.example.UseMe.Dto.CarUpdate;
 import com.example.UseMe.Dto.ServerResponse;
+import com.example.UseMe.Enum.CarUsage;
 import com.example.UseMe.Model.Car;
 
 
@@ -25,21 +26,15 @@ public interface CarService {
 	
 	public Car findByLocation(String carLocation);
 	
-	public Car findByCarUsage(String carUsage);
+	public Collection<Car> findByCarUsage(CarUsage carUsage);
 	
 	public ServerResponse viewAll();
 	
 	public Car findByCarRegNo(String carRegNo);
 	
-	public Car findByCarOwnerFirstName(String carOwnerFirstName);
-	
-	public Car findByCarOwnerPhoneNo(String carOwnerPhoneNo);
-	
-	public Car findByCarOwnerAddress(String carOwnerAddress);
-	
 	public ServerResponse delete(String carId);
 	
-	public ServerResponse createCar(CarSignUp carSignUp);
+	public ServerResponse createCar(String ownerId, CarSignUp carSignUp);
 	
 	public ServerResponse viewByBrand(String carBrand);
 	

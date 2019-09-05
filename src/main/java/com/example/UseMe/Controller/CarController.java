@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.UseMe.Constants.ServerResponseStatus;
@@ -36,24 +36,23 @@ public class CarController {
  *****************************************************************************************************************/
 	
 	
-	@ApiOperation(value = "REGISTER A CAR ACCOUNT", response = ServerResponse.class)
-	@RequestMapping( value = "/creatCar", method = RequestMethod.POST)
+	@ApiOperation(value = "Register car account", response = ServerResponse.class)
+	@RequestMapping( value = "/create/{ownerId}", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> create(@RequestBody CarSignUp carSignUp){
+	public ResponseEntity<?> create(@RequestHeader("Authorization")  String authorization,  @RequestBody CarSignUp carSignUp, @PathVariable("ownerId") String ownerId){
 		
 		
 		ServerResponse response = new ServerResponse();
 		
 		
 		try {
-			response = carService.createCar(carSignUp);
-			response.setSuccess(true);
-			response.setMessage("Car account created successfully");
-			
-			
+			response = carService.createCar(ownerId, carSignUp);
+		
 		
 		} catch (Exception e) {
 			response.setData("An error occured" + e.getMessage());
+			response.setMessage("An error occured");
+			response.setSuccess(false);
             response.setStatus(ServerResponseStatus.FAILED);
 		}
 		
@@ -63,10 +62,10 @@ public class CarController {
 /*******************************************************************************************************************
  * 	                           UPDATE CAR ACCOUNT DETAILS
  *******************************************************************************************************************/
-	@ApiOperation(value = "UPDATE A CAR ACCOUNT", response = ServerResponse.class)
-	@RequestMapping(value = "/updateCar/{carId}", method = RequestMethod.PUT)
+	@ApiOperation(value = "Update car account", response = ServerResponse.class)
+	@RequestMapping(value = "/update/{carId}", method = RequestMethod.PUT)
 	@ResponseBody
-    public ResponseEntity<?> update(@PathVariable("carId") String carId, @RequestBody CarUpdate carUpdate){
+    public ResponseEntity<?> update(@RequestHeader("Authorization")  String authorization,  @PathVariable("carId") String carId, @RequestBody CarUpdate carUpdate){
 	 
 	 ServerResponse response = new ServerResponse();
 		
@@ -74,11 +73,12 @@ public class CarController {
 		try {
 
 			response = carService.updateCar(carId, carUpdate);
-			response.setSuccess(true);
-			response.setMessage("Car account successfully updated");
-		
+			
+			
 		} catch (Exception e) {
 	     response.setData("An error occured" + e.getMessage());
+	     response.setMessage("An error occured");
+	     response.setSuccess(false);
          response.setStatus(ServerResponseStatus.FAILED);
 		}
 		
@@ -90,10 +90,10 @@ public class CarController {
  * 	                           GET CAR BY BRAND
  *******************************************************************************************************************/
 	
-	@ApiOperation(value = "GET CAR BY BRAND", response = ServerResponse.class)
-	@RequestMapping( value = "/byCarBrand{carBrand}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get car by brand", response = ServerResponse.class)
+	@RequestMapping( value = "/carbrand{carBrand}", method = RequestMethod.GET)
 	@ResponseBody
-    public ResponseEntity<?> viewByCarBrand(@PathVariable("carBrand") String carBrand ){
+    public ResponseEntity<?> viewByCarBrand(@RequestHeader("Authorization")  String authorization,    @PathVariable("carBrand") String carBrand ){
 	 
 	 
 	 ServerResponse response = new ServerResponse();
@@ -101,11 +101,12 @@ public class CarController {
 		
 		try {
 			response = carService.viewByBrand(carBrand);
-			response.setSuccess(true);
-			response.setMessage("Car fetched by brand");
-		
+			
+			
 		} catch (Exception e) {
 			response.setData("An error occured" + e.getMessage());
+			response.setMessage("An error occured");
+			response.setSuccess(false);
          response.setStatus(ServerResponseStatus.FAILED);
 		}
 		
@@ -119,22 +120,22 @@ public class CarController {
  ************************************************************************************************************/
 	
 
-	@ApiOperation(value = "GET CAR BY REG NO", response = ServerResponse.class)
-	@RequestMapping( value = "/byCarRegNo{carRegNo}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get car by reg no", response = ServerResponse.class)
+	@RequestMapping( value = "/regno{carRegNo}", method = RequestMethod.GET)
 	@ResponseBody
-    public ResponseEntity<?> viewByCarRegNo(@PathVariable("carRegNo") String carRegNo ){
+    public ResponseEntity<?> viewByCarRegNo(@RequestHeader("Authorization")  String authorization,   @PathVariable("carRegNo") String carRegNo ){
 	 
-	 
+		
 	 ServerResponse response = new ServerResponse();
-		
-		
+			
 		try {
 			response = carService.viewByRegNo(carRegNo);
-			response.setSuccess(true);
-			response.setMessage("Car fetched successfully by Reg No");
-		
+			
+			
 		} catch (Exception e) {
 			response.setData("An error occured" + e.getMessage());
+			response.setMessage("An error occured");
+			response.setSuccess(false);
          response.setStatus(ServerResponseStatus.FAILED);
 		}
 		
@@ -147,23 +148,21 @@ public class CarController {
  * 	                                 GET ALL CARS
  ******************************************************************************************************************/
 	
-	@ApiOperation(value = "GET ALL CARS", response = ServerResponse.class)
+	@ApiOperation(value = "Get all cars", response = ServerResponse.class)
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	@ResponseBody
-    public ResponseEntity<?> findAll() {
-	 
+    public ResponseEntity<?> viewAll(@RequestHeader("Authorization")  String authorization) {
 	 
 	 ServerResponse response = new ServerResponse();
 		
-		
 		try {
 			response = carService.viewAll();
-			response.setSuccess(true);
-			response.setMessage("All cars sucessfully fetched");
-					
+			
 		
 		} catch (Exception e) {
 			response.setData("An error occured" + e.getMessage());
+			response.setMessage("An error occured");
+			response.setSuccess(false);
          response.setStatus(ServerResponseStatus.FAILED);
 		}
 		
@@ -176,21 +175,21 @@ public class CarController {
  ***************************************************************************************************************/
 	
 	
-	@ApiOperation(value = "VIEW CAR BY BRAND AND MAKE YEAR", response = ServerResponse.class)
-	@RequestMapping(value = "/brand&year/carBrand/carMakeYear", method = RequestMethod.GET)
+	@ApiOperation(value = "Get car by brand and make year", response = ServerResponse.class)
+	@RequestMapping(value = "/brand/{carBrand}/year/{carMakeYear}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<?> findAllByCarBrandAndMakeYear(@RequestParam String carBrand, @RequestParam String carMakeYear){
+	public ResponseEntity<?> findAllByCarBrandAndMakeYear(@RequestHeader("Authorization")  String authorization,    @PathVariable("carBrand") String carBrand, @PathVariable("carMakeYear") String carMakeYear){
 		
 		ServerResponse response = new ServerResponse();
 		
-		
 		try {
 			response = carService.viewAllByCarBrandAndMakeYear(carBrand, carMakeYear);
-			response.setSuccess(true);
-			response.setMessage("Car fetched by brand and make year");
+			
 			
 		} catch (Exception e) {
 			response.setData("An error occured => " + e.getMessage());
+			response.setMessage("An error occured");
+			response.setSuccess(false);
             response.setStatus(ServerResponseStatus.FAILED);
 		}
 		
@@ -202,20 +201,21 @@ public class CarController {
  * 	                         DELETE CAR BY CAR ID
  ***************************************************************************************************************/
 	
-	@ApiOperation(value = "DELETE CAR ACCOUNT", response = ServerResponse.class)
-	@RequestMapping(value = "/{carId}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "Delete car account", response = ServerResponse.class)
+	@RequestMapping(value = "/delete{carId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity<?> delete(@RequestParam String carId){
+	public ResponseEntity<?> delete(@RequestHeader("Authorization")  String authorization,   @RequestParam String carId){
 		
 		ServerResponse response = new ServerResponse();
 		
 		try {
 			response = carService.delete(carId);
-			response.setSuccess(true);
-			response.setMessage("Car successfully deleted");
+		
 			
 		} catch (Exception e) {
 			response.setData("An error occured => " + e.getMessage());
+			response.setMessage("An error occured");
+			response.setSuccess(false);
             response.setStatus(ServerResponseStatus.FAILED);
 		}
 		

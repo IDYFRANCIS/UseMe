@@ -1,19 +1,28 @@
 package com.example.UseMe.Model;
 
 import java.io.Serializable;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "CarRenter")
+@Table(name = "car_renter")
 public class CarRenter implements Serializable{
 	
 	@Id
@@ -22,32 +31,42 @@ public class CarRenter implements Serializable{
 	@Column(name = "renter_id", nullable = false, unique = true)
 	private String renterId;
 	
-	@Column(name = "renterFirstName")
+	@Column(name = "renter_first_name")
 	private String renterFirstName;
 	
-	@Column(name = "renterMiddleName")
+	@Column(name = "renter_middle_name")
 	private String renterMiddleName;
 	
-	@Column(name = "renterLastName")
+	@Column(name = "renter_last_name")
 	private String RenterLastName;
 	
-	@Column(name = "renterGender")
+	@Column(name = "renter_gender")
 	private String renterGender;
 	
-	@Column(name = "renterAddress")
+	@Column(name = "renter_address")
 	private String renterAddress;
 	
-	@Column(name = "renterPhoneNo")
+	@Column(name = "renter_phone_no")
 	private String renterPhoneNo;
 	
-	@Column(name = "renterD.O.B")
+	@Column(name = "renter_d.o.b")
 	private String renterDateOfBirth;
 	
-	@Column(name = "renterEmail")
+	@Column(name = "renter_emal")
 	private String renterEmail;
-
+    
+	@JsonIgnore
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinTable(name = "owner_renter", joinColumns = @JoinColumn(name = "renter_id", referencedColumnName = "renter_id"), inverseJoinColumns = @JoinColumn(name = "owner_id", referencedColumnName = "owner_id"))
+	private Set<CarOwner> carOwner;
+	
+	//@JsonIgnore
+    @OneToMany(mappedBy = "carRenter", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Car> car;
 	
 	
+    
+    
 	public String getRenterId() {
 		return renterId;
 	}
@@ -119,8 +138,23 @@ public class CarRenter implements Serializable{
 	public void setRenterEmail(String renterEmail) {
 		this.renterEmail = renterEmail;
 	}
-	
-	
+
+	public Set<Car> getCar() {
+		return car;
+	}
+
+	public void setCar(Set<Car> car) {
+		this.car = car;
+	}
+
+	public Set<CarOwner> getCarOwner() {
+		return carOwner;
+	}
+
+	public void setCarOwner(Set<CarOwner> carOwner) {
+		this.carOwner = carOwner;
+	}
+
 	
 
 }

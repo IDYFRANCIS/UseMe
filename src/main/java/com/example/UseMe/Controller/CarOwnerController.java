@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.UseMe.Constants.ServerResponseStatus;
@@ -29,7 +29,6 @@ public class CarOwnerController {
 	@Autowired
 	CarOwnerService ownerService;
 	
-	
 	private HttpHeaders responseHeaders = new HttpHeaders();
 	
 	/*****************************************************************************************************************
@@ -37,20 +36,22 @@ public class CarOwnerController {
 	 *****************************************************************************************************************/
 		
 		
-		@ApiOperation(value = "REGISTER A CAR OWNER ACCOUNT", response = ServerResponse.class)
-		@RequestMapping(value = "/createOwner", method = RequestMethod.POST)
+		@ApiOperation(value = "Register a car owner account", response = ServerResponse.class)
+		@RequestMapping(value = "/create{userCode}", method = RequestMethod.POST)
 		@ResponseBody
-		public ResponseEntity<?> create(@RequestBody CarOwnerSignUp ownerSignUp){
+		public ResponseEntity<?> create(@RequestHeader("Authorization")  String authorization, @PathVariable("userCode") String userCode,  @RequestBody CarOwnerSignUp ownerSignUp){
 			
 			
 			ServerResponse response = new ServerResponse();
 			
 			
 			try {
-				response = ownerService.createCarOwner(ownerSignUp);
+				response = ownerService.createCarOwner(userCode, ownerSignUp);
 			
 			} catch (Exception e) {
 				response.setData("An error occured" + e.getMessage());
+				response.setMessage("An error occured");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 			}
 			
@@ -60,10 +61,10 @@ public class CarOwnerController {
 	/*******************************************************************************************************************
 	 * 	                           UPDATE CAR OWNER ACCOUNT DETAILS
 	 *******************************************************************************************************************/
-		@ApiOperation(value = "UPDATE A CAR OWNER ACCOUNT", response = ServerResponse.class)
-		@RequestMapping(value = "/updateOwner/{ownerId}", method = RequestMethod.PUT)
+		@ApiOperation(value = "Update a car owner account", response = ServerResponse.class)
+		@RequestMapping(value = "/update/{ownerId}", method = RequestMethod.PUT)
 		@ResponseBody
-	    public ResponseEntity<?> update(@PathVariable("ownerId")  String ownerId, @RequestBody CarOwnerUpdate ownerUpdate){
+	    public ResponseEntity<?> update(@RequestHeader("Authorization")  String authorization,  @PathVariable("ownerId")  String ownerId, @RequestBody CarOwnerUpdate ownerUpdate){
 		 
 		 
 		 ServerResponse response = new ServerResponse();
@@ -74,7 +75,9 @@ public class CarOwnerController {
 			
 			} catch (Exception e) {
 				response.setData("An error occured" + e.getMessage());
-	         response.setStatus(ServerResponseStatus.FAILED);
+				response.setMessage("An error occured");
+				response.setSuccess(false);
+	            response.setStatus(ServerResponseStatus.FAILED);
 			}
 			
 			return new ResponseEntity<ServerResponse>(response, responseHeaders, ServerResponse.getStatus(response.getStatus()));
@@ -87,10 +90,10 @@ public class CarOwnerController {
  * 		                         GET CAR OWNER BY PHONE NUMBER
  ****************************************************************************************************************/
 		
-		@ApiOperation(value = "GET CAR OWNER BY PHONE NUMBER", response = ServerResponse.class)
-		@RequestMapping( value = "/byOwnerPhoneNo{ownerPhoneNo}", method = RequestMethod.GET)
+		@ApiOperation(value = "Get car owner by phone number", response = ServerResponse.class)
+		@RequestMapping( value = "/phone-no{ownerPhoneNo}", method = RequestMethod.GET)
 		@ResponseBody
-	    public ResponseEntity<?> viewByCarOwnerPhoneNo(@PathVariable("ownerPhoneNo") String ownerPhoneNo ){
+	    public ResponseEntity<?> viewByCarOwnerPhoneNo(@RequestHeader("Authorization")  String authorization,  @PathVariable("ownerPhoneNo") String ownerPhoneNo ){
 		 
 		 
 		 ServerResponse response = new ServerResponse();
@@ -101,6 +104,8 @@ public class CarOwnerController {
 			
 			} catch (Exception e) {
 				response.setData("An error occured" + e.getMessage());
+				response.setMessage("An error occured");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 			}
 			
@@ -113,21 +118,20 @@ public class CarOwnerController {
  * 		                            GET ALL CAR OWNERS
  ***************************************************************************************************************/
 		
-		@ApiOperation(value = "GET ALL CAR OWNERS", response = ServerResponse.class)
+		@ApiOperation(value = "Get all car owners", response = ServerResponse.class)
 		@RequestMapping(value = "/all", method = RequestMethod.GET)
 		@ResponseBody
-	    public ResponseEntity<?> findAll() {
-		 
+	    public ResponseEntity<?> findAll(@RequestHeader("Authorization")  String authorization) {
 		 
 		 ServerResponse response = new ServerResponse();
 			
-			
 			try {
 				response = ownerService.viewAll();
-						
-			
+								
 			} catch (Exception e) {
 				response.setData("An error occured" + e.getMessage());
+				response.setMessage("An error occured");
+				response.setSuccess(false);
 	         response.setStatus(ServerResponseStatus.FAILED);
 	        
 			}
@@ -140,10 +144,10 @@ public class CarOwnerController {
  * 		                 DELETE CAR OWNER BY ID
  ***************************************************************************************************************/
 		
-		@ApiOperation(value = "DELETE CAR OWNER ACCOUNT", response = ServerResponse.class)
-		@RequestMapping(value = "/{ownerId}", method = RequestMethod.DELETE)
+		@ApiOperation(value = "Delete car owner account", response = ServerResponse.class)
+		@RequestMapping(value = "/delete{ownerId}", method = RequestMethod.DELETE)
 		@ResponseBody
-		public ResponseEntity<?> delete(@RequestParam String ownerId){
+		public ResponseEntity<?> delete(@RequestHeader("Authorization")  String authorization,  @RequestParam String ownerId){
 			
 			ServerResponse response = new ServerResponse();
 			
@@ -152,6 +156,8 @@ public class CarOwnerController {
 				
 			} catch (Exception e) {
 				response.setData("An error occured => " + e.getMessage());
+				response.setMessage("An error occured");
+				response.setSuccess(false);
 	            response.setStatus(ServerResponseStatus.FAILED);
 			}
 			

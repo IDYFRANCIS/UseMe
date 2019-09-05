@@ -19,4 +19,6 @@ public interface CarOwnerRepository extends CrudRepository<CarOwner, String>{
 	
 	public Collection<CarOwner> findAll();
 	
+//	public Collection<CarOwner> findByCarRenter_RenterId(String renterId);
+	
 }
