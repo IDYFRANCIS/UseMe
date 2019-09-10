@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -44,6 +45,7 @@ import io.swagger.annotations.ApiOperation;
 @Controller
 @RequestMapping(value = "/user", produces = "application/json")
 @Api(tags = "User Account Management", description = "Endpoint")
+//@PreAuthorize("hasAuthourity('admin') OR hasAuthority('super_admin')")
 public class UserController {
 	
 	@Autowired
@@ -65,6 +67,7 @@ public class UserController {
 	@ApiOperation(value = "Register a user account Note: account types are DEMO, BASIC, PREMIUM", response = ServerResponse.class)
 	@RequestMapping( method = RequestMethod.POST)
 	@ResponseBody
+	//@PreAuthorize("hasAuthourity('admin') OR hasAuthority('super_admin')")
 	public ResponseEntity<?> create(@RequestBody SignUpRequest request){
 		
 		logger.info("Starting to create user account at controller");
