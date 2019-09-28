@@ -17,11 +17,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @SpringBootApplication
 public class UseMeApplication {
 
-
 	 @Value("${security.signing-key}")
 	    private String SIGNING_KEY;
-
-	
 	
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
@@ -31,14 +28,12 @@ public class UseMeApplication {
     }
 
     
-    
     @Primary
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
     }
 
-   
     @Primary
     @Bean
     public DefaultTokenServices tokenServices() {

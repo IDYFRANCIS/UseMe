@@ -182,18 +182,18 @@ public class UserServiceImpl implements UserService{
                 return response;
 			}
 			
-			Privilege create = privilegeRepository.findByName(UserPrivilageType.create);
-			Privilege update = privilegeRepository.findByName(UserPrivilageType.update);
-			Privilege delete = privilegeRepository.findByName(UserPrivilageType.delete);
-			Privilege read = privilegeRepository.findByName(UserPrivilageType.read);
-			Privilege admin = privilegeRepository.findByName(UserPrivilageType.admin);
+			Privilege isAdmin = privilegeRepository.findByName(UserPrivilageType.isAdmin);
+			Privilege owner = privilegeRepository.findByName(UserPrivilageType.owner);
+			Privilege renter = privilegeRepository.findByName(UserPrivilageType.renter);
+			Privilege user = privilegeRepository.findByName(UserPrivilageType.user);
+			
 			
 			Collection<Privilege> adminPrivileges = new HashSet<>();
-			adminPrivileges.add(create);
-			adminPrivileges.add(update);
-			adminPrivileges.add(delete);
-			adminPrivileges.add(read);
-			adminPrivileges.add(admin);
+			adminPrivileges.add(isAdmin);
+			adminPrivileges.add(owner);
+			adminPrivileges.add(renter);
+			adminPrivileges.add(user);
+			
 			
 			User = new User();
 			User.setPrivileges(adminPrivileges);
@@ -254,13 +254,7 @@ public class UserServiceImpl implements UserService{
 			User.setPassword(passwordEncoder.encode(password));
 			User.setActive(true);
 			User.setActivationCode(null);
-						
-			
-//	        response.setData(User);
-//            response.setMessage("User successfully created");
-//            response.setSuccess(true);
-//            response.setStatus(ServerResponseStatus.OK);
-//            
+						           
 			
 			response.setData("User successfully activated");
 	        response.setMessage("User successfully activated");

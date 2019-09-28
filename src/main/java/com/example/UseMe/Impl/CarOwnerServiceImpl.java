@@ -108,7 +108,7 @@ public class CarOwnerServiceImpl implements CarOwnerService{
 			String ownerGender = ownerSignUp.getOwnerGender() != null ? ownerSignUp.getOwnerGender() : ownerSignUp.getOwnerGender();
 			String ownerAddress = ownerSignUp.getOwnerAddress() != null ? ownerSignUp.getOwnerAddress() : ownerSignUp.getOwnerAddress();
 			String ownerDateOfBirth = ownerSignUp.getOwnerDateOfBirth() != null ? ownerSignUp.getOwnerDateOfBirth() : ownerSignUp.getOwnerDateOfBirth();
-			
+			String role      =    ownerSignUp.getRole() != null ? ownerSignUp.getRole() : ownerSignUp.getRole();
 
 			if (!Utility.isValidEmail(ownerEmail)) {
 				
@@ -161,6 +161,8 @@ public class CarOwnerServiceImpl implements CarOwnerService{
 				owner.setOwnerGender(ownerGender);
 				owner.setOwnerAddress(ownerAddress);
 				owner.setOwnerDateOfBirth(ownerDateOfBirth);
+				owner.setRole(role);
+				
 				
 				entityManager.persist(owner);
 

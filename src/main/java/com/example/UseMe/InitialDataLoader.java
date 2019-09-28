@@ -64,61 +64,85 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
 		Privilege privileges;
 		
+		Privilege isAdmin = privilegeRepository.findByName(UserPrivilageType.isAdmin);
+		Privilege owner = privilegeRepository.findByName(UserPrivilageType.owner);
+		Privilege renter = privilegeRepository.findByName(UserPrivilageType.renter);
+		Privilege user = privilegeRepository.findByName(UserPrivilageType.user);
 		Privilege create = privilegeRepository.findByName(UserPrivilageType.create);
-		Privilege upadte = privilegeRepository.findByName(UserPrivilageType.update);
-		Privilege delete = privilegeRepository.findByName(UserPrivilageType.delete);
 		Privilege read = privilegeRepository.findByName(UserPrivilageType.read);
-		Privilege admin = privilegeRepository.findByName(UserPrivilageType.admin);
+		Privilege update = privilegeRepository.findByName(UserPrivilageType.update);
+		Privilege delete = privilegeRepository.findByName(UserPrivilageType.delete);
+
+		
+		
+		if (isAdmin == null) {
+			privileges = new Privilege();
+			privileges.setName(UserPrivilageType.isAdmin);
+			privilegeRepository.save(privileges);
+		}
+
+		if (owner == null) {
+			privileges = new Privilege();
+			privileges.setName(UserPrivilageType.owner);
+			privilegeRepository.save(privileges);
+		}
+		if (renter == null) {
+			privileges = new Privilege();
+			privileges.setName(UserPrivilageType.renter);
+			privilegeRepository.save(privileges);
+		}
+
+		if (user == null) {
+			privileges = new Privilege();
+			privileges.setName(UserPrivilageType.user);
+			privilegeRepository.save(privileges);
+		}
 		
 		if (create == null) {
 			privileges = new Privilege();
 			privileges.setName(UserPrivilageType.create);
 			privilegeRepository.save(privileges);
 		}
-
-		if (upadte == null) {
-			privileges = new Privilege();
-			privileges.setName(UserPrivilageType.update);
-			privilegeRepository.save(privileges);
-		}
-		if (delete == null) {
-			privileges = new Privilege();
-			privileges.setName(UserPrivilageType.delete);
-			privilegeRepository.save(privileges);
-		}
-
+		
 		if (read == null) {
 			privileges = new Privilege();
 			privileges.setName(UserPrivilageType.read);
 			privilegeRepository.save(privileges);
 		}
 
-		if (admin == null) {
+		if (update == null) {
 			privileges = new Privilege();
-			privileges.setName(UserPrivilageType.admin);
+			privileges.setName(UserPrivilageType.update);
 			privilegeRepository.save(privileges);
 		}
 		
-		
-
+		if (delete == null) {
+			privileges = new Privilege();
+			privileges.setName(UserPrivilageType.delete);
+			privilegeRepository.save(privileges);
+		}
+	
 		return null;
 	}
 
+	
 	private User createAdminAccountIfNotFound() {
 
 		User userAccount = userRepository.findByEmail(appConstants.APP_ADMIN_EMAIL);
 		Privilege create = privilegeRepository.findByName(UserPrivilageType.create);
+		Privilege read = privilegeRepository.findByName(UserPrivilageType.read);
 		Privilege update = privilegeRepository.findByName(UserPrivilageType.update);
 		Privilege delete = privilegeRepository.findByName(UserPrivilageType.delete);
-		Privilege read = privilegeRepository.findByName(UserPrivilageType.read);
-		Privilege admin = privilegeRepository.findByName(UserPrivilageType.admin);
+		Privilege isAdmin = privilegeRepository.findByName(UserPrivilageType.isAdmin);
+		
 		
 		Collection<Privilege> adminPrivileges = new HashSet<>();
 		adminPrivileges.add(create);
+		adminPrivileges.add(read);
 		adminPrivileges.add(update);
 		adminPrivileges.add(delete);
-		adminPrivileges.add(read);
-		adminPrivileges.add(admin);
+		adminPrivileges.add(isAdmin);
+		
 		
 		logger.info("Starting to create admin account ");
 

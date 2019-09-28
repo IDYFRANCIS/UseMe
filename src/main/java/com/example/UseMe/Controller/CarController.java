@@ -3,6 +3,7 @@ package com.example.UseMe.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +39,7 @@ public class CarController {
 	
 	@ApiOperation(value = "Register car account", response = ServerResponse.class)
 	@RequestMapping( value = "/create/{ownerId}", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('isAdmin') OR hasAuthority('owner')")
 	@ResponseBody
 	public ResponseEntity<?> create(@RequestHeader("Authorization")  String authorization,  @RequestBody CarSignUp carSignUp, @PathVariable("ownerId") String ownerId){
 		
@@ -145,7 +147,7 @@ public class CarController {
 	
 	
 /*******************************************************************************************************************
- * 	                                 GET ALL CARS
+ * 	                                 GET ALL CARS // withouth auth
  ******************************************************************************************************************/
 	
 	@ApiOperation(value = "Get all cars", response = ServerResponse.class)

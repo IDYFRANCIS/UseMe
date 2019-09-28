@@ -56,6 +56,9 @@ public class CarOwner implements Serializable{
 	
 	@Column(name = "owner_email")
 	private String ownerEmail;
+	
+	@Column(name = "owner_role")
+	private String role;
 
 	@JsonIgnore
     @OneToMany(mappedBy = "carOwner", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -113,6 +116,16 @@ public class CarOwner implements Serializable{
 
 	public void setOwnerAddress(String ownerAddress) {
 		this.ownerAddress = ownerAddress;
+	}
+	
+	
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public String getOwnerPhoneNo() {

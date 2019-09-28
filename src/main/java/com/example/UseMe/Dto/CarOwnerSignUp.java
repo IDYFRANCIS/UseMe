@@ -10,6 +10,7 @@ public class CarOwnerSignUp {
 	private String ownerPhoneNo;
 	private String ownerEmail;
 	private String ownerDateOfBirth;
+	private String role;
 	
 	
 	
@@ -77,6 +78,16 @@ public class CarOwnerSignUp {
 	public void setOwnerDateOfBirth(String ownerDateOfBirth) {
 		this.ownerDateOfBirth = ownerDateOfBirth;
 	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
+	
 	
 	
 }
